@@ -16,7 +16,6 @@ void per_vertex_normals(
     vertex_triangle_adjacency(F, V.rows(), surfaces);
 
     for (int i = 0; i < V.rows(); i++) {
-
         for (int j = 0; j < surfaces[i].size(); j++) {
             int face = surfaces[i][j];
             N.row(i) = N.row(i) + triangle_area_normal(V.row(F(face, 0)), V.row(F(face, 1)), V.row(F(face, 2)));
