@@ -27,7 +27,7 @@ void catmull_clark(
     FP.resize(F.rows(), 3);
 
     for (int j = 0; j < F.rows(); j++) {
-        FP.row(j) = V.row(F(j, 0)) + V.row(F(j, 1)) + V.row(F(j, 2)) + V.row(F(j, 3)) / 4.0;
+        FP.row(j) = (V.row(F(j, 0)) + V.row(F(j, 1)) + V.row(F(j, 2)) + V.row(F(j, 3))) / 4.0;
 
         SV.conservativeResize(SV.rows() + 1, SV.cols());
         SV.row(SV.rows() - 1) = FP.row(j);
@@ -63,6 +63,7 @@ void catmull_clark(
             std::string key = std::to_string(fmin(v1, v2)) + "-" + std::to_string(fmax(v1, v2));
 
             if (EP.find(key) == EP.end()) {
+
                 int index = SV.rows();
                 SV.conservativeResize(SV.rows() + 1, SV.cols());
                 SV.row(index) = V.row(v1) + V.row(v2);
@@ -119,11 +120,6 @@ void catmull_clark(
         Eigen::RowVector3d result = (cF + R + (n - 3) * V.row(j)) / n;
 
         SV.row(j) = result;
-
-        std::cout << "From " << V(j, 0) << " " << V(j, 1) << " " << V(j, 2) << " " << std::endl;
-        std::cout << "F is " << cF(0) << " " << cF(1) << " " << cF(2) << " " << std::endl;
-        std::cout << "R is " << R(0) / 2 << " " << R(1) / 2 << " " << R(2) / 2 << " " << std::endl;
-        std::cout << "To   " << SV(j, 0) << " " << SV(j, 1) << " " << SV(j, 2) << " " << std::endl;
     }
 
     // Create New Face
@@ -132,17 +128,16 @@ void catmull_clark(
             int v = F(j, k);
 
             int v1 = F(j, (k + 1) % F.cols());
-            int v2 = F(j, (k + 1) % F.cols());
+            int v2 = F(j, (k + 3) % F.cols());
 
 
-            std::string key1 = std::to_string(fmin(v, v1)) + "-" + std::to_string(fmax(v, v2));
-            std::string key2 = std::to_string(fmin(v, v1)) + "-" + std::to_string(fmax(v, v2));
+            std::string key1 = std::to_string(fmin(v, v1)) + "-" + std::to_string(fmax(v, v1));
+            std::string key2 = std::to_string(fmin(v, v2)) + "-" + std::to_string(fmax(v, v2));
 
             int p1 = EP.find(key1)->second;
             int p2 = EP.find(key2)->second;
 
             SF.row(4 * j + k) = Eigen::RowVector4i(v, p1, V.rows() + j, p2);
-
         }
     }
 
